@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fish Nutrition Game</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .container {
+            width: 80%;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        .sliders, .info, .graphs {
+            margin-bottom: 20px;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .slider-container label {
+            width: 100px;
+        }
+        .slider-container input[type="range"] {
+            flex-grow: 1;
+        }
+        .slider-container span {
+            width: 50px;
+            text-align: right;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        #totalPercentageDisplay {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 15px;
+        }
+        canvas {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <div class="sliders">
+            <h2>Nutrient Allocation</h2>
+            <div class="slider-container">
+                <label for="protein">Protein:</label>
+                <input type="range" id="protein" min="5" max="100" step="5" value="60">
+                <span id="proteinValue">60%</span>
+            </div>
+            <div class="slider-container">
+                <label for="carbon">Carbon:</label>
+                <input type="range" id="carbon" min="5" max="100" step="5" value="20">
+                <span id="carbonValue">20%</span>
+            </div>
+            <div class="slider-container">
+                <label for="vitamin">Vitamin:</label>
+                <input type="range" id="vitamin" min="5" max="100" step="5" value="10">
+                <span id="vitaminValue">10%</span>
+            </div>
+            <div class="slider-container">
+                <label for="enzyme">Enzyme:</label>
+                <input type="range" id="enzyme" min="5" max="100" step="5" value="5">
+                <span id="enzymeValue">5%</span>
+            </div>
+            <div class="slider-container">
+                <label for="bone">Bone:</label>
+                <input type="range" id="bone" min="5" max="100" step="5" value="5">
+                <span id="boneValue">5%</span>
+            </div>
+            <div id="totalPercentageDisplay">Total: <span id="totalPercentage">100%</span></div>
+        </div>
+        <div class="buttons">
+            <button id="weightGraphBtn">Weight Graph</button>
+            <button id="healthGraphBtn">Health Index Graph</button>
+            <button id="refreshBtn">Refresh</button>
+        </div>
+    </div>
+
+    <div class="container info">
+        <h2>Calculated Information</h2>
+        <p>Weight Gain Rate: <span id="weightGainRate"></span></p>
+        <p>FCR: <span id="fcr"></span></p>
+    </div>
+
+    <div class="container">
+         <label for="initialWeight">Initial Weight (20g-40g):</label>
+         <input type="number" id="initialWeight" min="20" max="40" value="30">
+    </div>
+
+    <div class="container graphs">
+        <canvas id="weightChart"></canvas>
+        <canvas id="healthChart"></canvas>
+    </div>
+
+    <script>
+        const proteinSlider = document.getElementById('protein');
+        const carbonSlider = document.getElementById('carbon');
+        const vitaminSlider = document.getElementById('vitamin');
+        const enzymeSlider = document.getElementById('enzyme');
+        const boneSlider = document.getElementById('bone');
+
+        const proteinValue = document.getElementById('proteinValue');
+        const carbonValue = document.getElementById('carbonValue');
+        const vitaminValue = document.getElementById('vitaminValue');
+        const enzymeValue = document.getElementById('enzymeValue');
+        const boneValue = document.getElementById('boneValue');
+
+        const totalPercentageEl = document.getElementById('totalPercentage');
+
+        const weightGainRateEl = document.getElementById('weightGainRate');
+        const fcrEl = document.getElementById('fcr');
+
+        const initialWeightInput = document.getElementById('initialWeight');
+
+        const weightGraphBtn = document.getElementById('weightGraphBtn');
+        const healthGraphBtn = document.getElementById('healthGraphBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        let weightChart;
+        let healthChart;
+
+        function updateValues() {
+            const protein = parseInt(proteinSlider.value);
+            const carbon = parseInt(carbonSlider.value);
+            const vitamin = parseInt(vitaminSlider.value);
+            const enzyme = parseInt(enzymeSlider.value);
+            const bone = parseInt(boneSlider.value);
+
+            const total = protein + carbon + vitamin + enzyme + bone;
+
+            proteinValue.textContent = protein + '%';
+            carbonValue.textContent = carbon + '%';
+            vitaminValue.textContent = vitamin + '%';
+            enzymeValue.textContent = enzyme + '%';
+            boneValue.textContent = bone + '%';
+            totalPercentageEl.textContent = total + '%';
+            totalPercentageEl.style.color = total === 100 ? 'green' : 'red';
+
+
+            const weightGainRate = roundTo(((0.6 * protein / 100 + 0.2 * carbon / 100 + 0.3 * vitamin / 100) * (1 + 0.1 * enzyme / 100) + 0.15 * bone / 100 - 20 * (bone / 100 * bone / 100)) * 100, 3);
+            const fcr = roundTo((1.8 + 0.02 * bone / 100 - 0.01 * protein / 100 - 0.005 - 0.03 + enzyme / 100) * 100, 5);
+
+            weightGainRateEl.textContent = weightGainRate + '%';
+            fcrEl.textContent = fcr;
+        }
+
+        function roundTo(n, digits) {
+            if (digits === undefined) {
+                digits = 0;
+            }
+            const multiplicator = Math.pow(10, digits);
+            n = parseFloat((n * multiplicator).toFixed(11));
+            return Math.round(n) / multiplicator;
+        }
+
+        function generateWeightGraph() {
+            const protein = parseInt(proteinSlider.value);
+            const carbon = parseInt(carbonSlider.value);
+            const vitamin = parseInt(vitaminSlider.value);
+            const enzyme = parseInt(enzymeSlider.value);
+            const bone = parseInt(boneSlider.value);
+
+            if (protein + carbon + vitamin + enzyme + bone !== 100) {
+                alert('The sum of all nutrients must be 100%. Please adjust the sliders.');
+                return;
+            }
+
+            let initialWeight = parseFloat(initialWeightInput.value);
+            if (initialWeight < 20 || initialWeight > 40) {
+                alert('Initial weight must be between 20g and 40g.');
+                return;
+            }
+
+            const weightGainRate = ((0.6 * protein / 100 + 0.2 * carbon / 100 + 0.3 * vitamin / 100) * (1 + 0.1 * enzyme / 100) + 0.15 * bone / 100 - 20 * (bone / 100 * bone / 100));
+
+            const weeks = Array.from({ length: 51 }, (_, i) => i);
+            const weightData = [initialWeight];
+            let currentWeight = initialWeight;
+
+            for (let i = 1; i <= 50; i++) {
+                currentWeight *= (1 + weightGainRate / 5);
+                weightData.push(currentWeight);
+            }
+
+            if (weightChart) {
+                weightChart.destroy();
+            }
+
+            weightChart = new Chart(document.getElementById('weightChart'), {
+                type: 'line',
+                data: {
+                    labels: weeks,
+                    datasets: [{
+                        label: 'Weight (g)',
+                        data: weightData,
+                        borderColor: 'blue',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Weight Change Over 50 Weeks'
+                    },
+                    scales: {
+                        xAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Weeks'
+                            }
+                        }],
+                        yAxes: [{
+                             scaleLabel: {
+                                display: true,
+                                labelString: 'Weight (g)'
+                            },
+                            ticks: {
+                                beginAtZero: false
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+
+        function generateHealthGraph() {
+            const protein = parseInt(proteinSlider.value);
+            const carbon = parseInt(carbonSlider.value);
+            const vitamin = parseInt(vitaminSlider.value);
+            const enzyme = parseInt(enzymeSlider.value);
+            const bone = parseInt(boneSlider.value);
+
+            if (protein + carbon + vitamin + enzyme + bone !== 100) {
+                alert('The sum of all nutrients must be 100%. Please adjust the sliders.');
+                return;
+            }
+            
+            const healthIndexChange = (-(1.5 * Math.pow(1 + bone / 100, 5)) - 0.1 * (carbon/100) + 1.5 * (vitamin/100) + 2 * (enzyme/100) + 0.2 * (protein/100));
+            
+            const weeks = Array.from({ length: 50 }, (_, i) => i + 1);
+            const healthData = [];
+            
+            let currentHealthIndex = 90 + healthIndexChange;
+            healthData.push(currentHealthIndex);
+
+            for (let i = 1; i < 50; i++) {
+                currentHealthIndex += healthIndexChange;
+                healthData.push(currentHealthIndex);
+            }
+
+            if (healthChart) {
+                healthChart.destroy();
+            }
+
+            healthChart = new Chart(document.getElementById('healthChart'), {
+                type: 'line',
+                data: {
+                    labels: weeks,
+                    datasets: [{
+                        label: 'Health Index',
+                        data: healthData,
+                        borderColor: 'green',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Health Index Change Over 50 Weeks'
+                    },
+                     scales: {
+                        xAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Weeks'
+                            }
+                        }],
+                        yAxes: [{
+                             scaleLabel: {
+                                display: true,
+                                labelString: 'Health Index'
+                            },
+                            ticks: {
+                                beginAtZero: false
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+
+        proteinSlider.addEventListener('input', updateValues);
+        carbonSlider.addEventListener('input', updateValues);
+        vitaminSlider.addEventListener('input', updateValues);
+        enzymeSlider.addEventListener('input', updateValues);
+        boneSlider.addEventListener('input', updateValues);
+
+        weightGraphBtn.addEventListener('click', generateWeightGraph);
+        healthGraphBtn.addEventListener('click', generateHealthGraph);
+        refreshBtn.addEventListener('click', () => location.reload());
+
+        updateValues();
+    </script>
+</body>
+</html>
