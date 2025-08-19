@@ -106,7 +106,7 @@
         }
         #weightGraphBtn { background-color: #3498db; color: white; }
         #healthGraphBtn { background-color: #2ecc71; color: white; }
-        #refreshBtn { background-color: #e74c3c; color: white; flex-grow: 0; }
+        #openVideoBtn { background-color: #9b59b6; color: white; flex-grow: 0; } /* Changed color */
         .buttons button:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 8px rgba(0,0,0,0.15);
@@ -155,6 +155,61 @@
             background-color: #fff;
             border-radius: 10px;
             padding: 10px;
+        }
+
+        /* --- STYLES FOR VIDEO MODAL --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.75);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 80%;
+            max-width: 900px;
+            position: relative;
+            animation: fadeIn 0.5s;
+        }
+        #popup-video {
+            width: 100%;
+            border-radius: 5px;
+        }
+        .close-button {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            color: #fff;
+            background-color: #333;
+            font-size: 30px;
+            font-weight: bold;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            background-color: #e74c3c;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
         
         @media (max-width: 1200px) {
@@ -217,7 +272,8 @@
                  <div class="buttons">
                     <button id="weightGraphBtn">⚖️ 體重變化圖形</button>
                     <button id="healthGraphBtn">❤️ 健康指數變化圖形</button>
-                    <button id="refreshBtn">🕹 魚兒動畫</button>
+                    <!-- This button now opens the video -->
+                    <button id="openVideoBtn">🎬 魚兒動畫</button> 
                 </div>
             </div>
         </div>
@@ -231,31 +287,42 @@
         </div>
     </div>
 
+    <!-- HIDDEN VIDEO MODAL HTML -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <span id="closeBtn" class="close-button">&times;</span>
+            <video id="popup-video" controls>
+                <!-- 
+                  IMPORTANT: Replace the 'src' link below with your own GitHub video link.
+                  This placeholder video is just for demonstration.
+                -->
+                
+                <source src="https://private-user-images.githubusercontent.com/157087457/479397901-46bdf3a7-279f-4fc4-a467-ff90c48bb1ce.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTU1OTAzNTgsIm5iZiI6MTc1NTU5MDA1OCwicGF0aCI6Ii8xNTcwODc0NTcvNDc5Mzk3OTAxLTQ2YmRmM2E3LTI3OWYtNGZjNC1hNDY3LWZmOTBjNDhiYjFjZS5tcDQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwODE5JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDgxOVQwNzU0MThaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT02NGUxYWIwYTI5NmZkMTBmYzI1ZWRjMTI4OTlmNTkwNjkyZTRkMzI5Y2JlZDhhMDdmMTg2NGUwNTU5NzYwMDVhJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.SnRayknoer_OSMXlpRUZ-6JrmMUbKMT8Z4TF32bHPlM" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+
     <script>
+        // --- Existing Game Logic ---
         const proteinSlider = document.getElementById('protein');
         const carbonSlider = document.getElementById('carbon');
         const vitaminSlider = document.getElementById('vitamin');
         const enzymeSlider = document.getElementById('enzyme');
         const boneSlider = document.getElementById('bone');
-
         const proteinValue = document.getElementById('proteinValue');
         const carbonValue = document.getElementById('carbonValue');
         const vitaminValue = document.getElementById('vitaminValue');
         const enzymeValue = document.getElementById('enzymeValue');
         const boneValue = document.getElementById('boneValue');
-
         const totalPercentageEl = document.getElementById('totalPercentage');
         const totalPercentageDisplay = document.getElementById('totalPercentageDisplay');
-
         const weightGainRateEl = document.getElementById('weightGainRate');
         const fcrEl = document.getElementById('fcr');
-
         const initialWeightInput = document.getElementById('initialWeight');
-
         const weightGraphBtn = document.getElementById('weightGraphBtn');
         const healthGraphBtn = document.getElementById('healthGraphBtn');
-        const refreshBtn = document.getElementById('refreshBtn');
-
+        // const refreshBtn = document.getElementById('refreshBtn'); // This is now the video button
         let weightChart;
         let healthChart;
 
@@ -265,16 +332,13 @@
             const vitamin = parseInt(vitaminSlider.value);
             const enzyme = parseInt(enzymeSlider.value);
             const bone = parseInt(boneSlider.value);
-
             const total = protein + carbon + vitamin + enzyme + bone;
-
             proteinValue.textContent = protein + '%';
             carbonValue.textContent = carbon + '%';
             vitaminValue.textContent = vitamin + '%';
             enzymeValue.textContent = enzyme + '%';
             boneValue.textContent = bone + '%';
             totalPercentageEl.textContent = total + '%';
-            
             if (total === 100) {
                 totalPercentageDisplay.style.backgroundColor = '#d4edda';
                 totalPercentageDisplay.style.color = '#155724';
@@ -282,24 +346,21 @@
                 totalPercentageDisplay.style.backgroundColor = '#f8d7da';
                 totalPercentageDisplay.style.color = '#721c24';
             }
-
             const weightGainRate = roundTo(((0.6 * protein / 100 + 0.2 * carbon / 100 + 0.3 * vitamin / 100) * (1 + 0.1 * enzyme / 100) + 0.15 * bone / 100 - 20 * (bone / 100 * bone / 100)) * 100, 3);
             const fcr = roundTo((1.8 + 0.02 * bone / 100 - 0.01 * protein / 100 - 0.005 - 0.03 + enzyme / 100) * 100, 5);
-
             weightGainRateEl.textContent = weightGainRate + '%';
             fcrEl.textContent = fcr;
         }
 
         function roundTo(n, digits) {
-            if (digits === undefined) {
-                digits = 0;
-            }
+            if (digits === undefined) { digits = 0; }
             const multiplicator = Math.pow(10, digits);
             n = parseFloat((n * multiplicator).toFixed(11));
             return Math.round(n) / multiplicator;
         }
 
         function generateWeightGraph() {
+            // ... (rest of the function is unchanged)
             const protein = parseInt(proteinSlider.value);
             const carbon = parseInt(carbonSlider.value);
             const vitamin = parseInt(vitaminSlider.value);
@@ -370,6 +431,7 @@
         }
 
         function generateHealthGraph() {
+            // ... (rest of the function is unchanged)
             const protein = parseInt(proteinSlider.value);
             const carbon = parseInt(carbonSlider.value);
             const vitamin = parseInt(vitaminSlider.value);
@@ -443,15 +505,38 @@
         vitaminSlider.addEventListener('input', updateValues);
         enzymeSlider.addEventListener('input', updateValues);
         boneSlider.addEventListener('input', updateValues);
-
         weightGraphBtn.addEventListener('click', generateWeightGraph);
         healthGraphBtn.addEventListener('click', generateHealthGraph);
-        refreshBtn.addEventListener('click', () => location.reload());
-
+        // refreshBtn.addEventListener('click', () => location.reload()); // Removed old functionality
         updateValues();
+
+        // --- NEW SCRIPT FOR VIDEO MODAL ---
+        const modal = document.getElementById("videoModal");
+        const btn = document.getElementById("openVideoBtn");
+        const span = document.getElementById("closeBtn");
+        const video = document.getElementById("popup-video");
+
+        // When the user clicks the button, open the modal
+        btn.onclick = function() {
+            modal.style.display = "flex";
+            video.play();
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+            video.pause();
+            video.currentTime = 0;
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                video.pause();
+                video.currentTime = 0;
+            }
+        }
     </script>
 </body>
-
 </html>
-
-
