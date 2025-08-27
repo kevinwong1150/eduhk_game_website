@@ -106,12 +106,12 @@
         }
         #weightGraphBtn { background-color: #3498db; color: white; }
         #healthGraphBtn { background-color: #2ecc71; color: white; }
-        #openVideoBtn { background-color: #9b59b6; color: white; flex-grow: 0; } /* Changed color */
+        #openVideoBtn { background-color: #9b59b6; color: white; flex-grow: 0; }
         .buttons button:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 8px rgba(0,0,0,0.15);
         }
-        
+
         .info p {
             font-size: 1.2em;
             font-weight: 600;
@@ -123,7 +123,13 @@
             padding: 5px 10px;
             border-radius: 5px;
         }
-        
+
+        #boneConditionHint {
+            color: #c0392b; /* A reddish color for warnings */
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
         .input-group {
             display: flex;
             align-items: center;
@@ -143,7 +149,7 @@
             font-size: 1em;
             width: 80px;
         }
-        
+
         .input-group span {
            font-weight: 400;
            font-size: 0.9em;
@@ -211,7 +217,7 @@
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
-        
+
         @media (max-width: 1200px) {
             .main-layout {
                 grid-template-columns: 1fr;
@@ -229,27 +235,27 @@
                 <h2>🧪 魚兒體重及營養設定</h2>
                 <div class="sliders">
                     <div class="slider-container">
-                        <label for="protein">💪 廚餘蛋白質:</label>
-                        <input type="range" id="protein" min="30" max="60" step="10" value="60">
+                        <label for="protein">💪廚餘蛋白質:</label>
+                        <input type="range" id="protein" min="30" max="60" step="10" value="40">
                         <span id="proteinValue">60%</span>
                     </div>
                     <div class="slider-container">
-                        <label for="carbon">⚡ 碳水化合物:</label>
-                        <input type="range" id="carbon" min="20" max="40" step="10" value="20">
+                        <label for="carbon">⚡碳水化合物:</label>
+                        <input type="range" id="carbon" min="20" max="40" step="10" value="40">
                         <span id="carbonValue">20%</span>
                     </div>
                     <div class="slider-container">
-                        <label for="vitamin">💊 維他命礦物質複合物:</label>
+                        <label for="vitamin">💊維他命礦物質複合物:</label>
                         <input type="range" id="vitamin" min="5" max="15" step="5" value="10">
                         <span id="vitaminValue">10%</span>
                     </div>
                     <div class="slider-container">
-                        <label for="enzyme">✨ 蛋白酶:</label>
+                        <label for="enzyme">✨蛋白酶:</label>
                         <input type="range" id="enzyme" min="0" max="5" step="5" value="5">
                         <span id="enzymeValue">5%</span>
                     </div>
                     <div class="slider-container">
-                        <label for="bone">🦴 骨粉:</label>
+                        <label for="bone">🦴骨粉:</label>
                         <input type="range" id="bone" min="0" max="20" step="5" value="5">
                         <span id="boneValue">5%</span>
                     </div>
@@ -257,23 +263,24 @@
                 </div>
 
                 <div class="input-group">
-                    <label for="initialWeight">⚖️ 起始體重:</label>
+                    <label for="initialWeight">⚖️起始體重:</label>
                     <input type="number" id="initialWeight" min="20" max="40" value="30">
                     <span>(20g-40g)</span>
                 </div>
             </div>
-            
+
             <div class="container">
-                <h2>📈 魚兒數據</h2>
+                <h2>📈魚兒數據</h2>
                 <div class="info">
                     <p>增重率: <span id="weightGainRate"></span></p>
                     <p>飼料轉化率: <span id="fcr"></span></p>
+                    <small>提示：如果魚兒的體重趨向零,它會死亡。</small>
+                    <br><small id="boneConditionHint"></small><br>
                 </div>
                  <div class="buttons">
                     <button id="weightGraphBtn">⚖️ 體重變化圖形</button>
                     <button id="healthGraphBtn">❤️ 健康指數變化圖形</button>
-                    <!-- This button now opens the video -->
-                    <button id="openVideoBtn">🎬 魚兒動畫</button> 
+                    <button id="openVideoBtn">🎬 魚兒動畫</button>
                 </div>
             </div>
         </div>
@@ -292,19 +299,14 @@
         <div class="modal-content">
             <span id="closeBtn" class="close-button">&times;</span>
             <video id="popup-video" controls>
-                <!-- 
-                  IMPORTANT: Replace the 'src' link below with your own GitHub video link.
-                  This placeholder video is just for demonstration.
-                -->
-                
-                <source src="https://private-user-images.githubusercontent.com/157087457/479397901-46bdf3a7-279f-4fc4-a467-ff90c48bb1ce.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTU1OTE4NDYsIm5iZiI6MTc1NTU5MTU0NiwicGF0aCI6Ii8xNTcwODc0NTcvNDc5Mzk3OTAxLTQ2YmRmM2E3LTI3OWYtNGZjNC1hNDY3LWZmOTBjNDhiYjFjZS5tcDQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwODE5JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDgxOVQwODE5MDZaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT02MTM0ZDcwM2E0MzU2NTI3MzMwNGZjNWM4ZDQ0NDM2YzU4ZDQyOWYxZWI3YWFiZDU0MzZmMDFjYmI2NTYwNzYyJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.fs_QfY9Psxn0hGaGQjcbmqIYzKTu2LQsfqjGZcCjmrA" type="video/mp4">
+                <source src="https://kevinwong1150.github.io/eduhk_game_website/fish_new_dead.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
     </div>
 
     <script>
-        // --- Existing Game Logic ---
+        // --- Game Logic ---
         const proteinSlider = document.getElementById('protein');
         const carbonSlider = document.getElementById('carbon');
         const vitaminSlider = document.getElementById('vitamin');
@@ -322,7 +324,7 @@
         const initialWeightInput = document.getElementById('initialWeight');
         const weightGraphBtn = document.getElementById('weightGraphBtn');
         const healthGraphBtn = document.getElementById('healthGraphBtn');
-        // const refreshBtn = document.getElementById('refreshBtn'); // This is now the video button
+        const boneConditionHint = document.getElementById('boneConditionHint'); // Get the new hint element
         let weightChart;
         let healthChart;
 
@@ -349,7 +351,28 @@
             const weightGainRate = roundTo(((0.6 * protein / 100 + 0.2 * carbon / 100 + 0.3 * vitamin / 100) * (1 + 0.1 * enzyme / 100) + 0.15 * bone / 100 - 20 * (bone / 100 * bone / 100)) * 100, 3);
             const fcr = roundTo((1.8 + 0.02 * bone / 100 - 0.01 * protein / 100 - 0.005 - 0.03 + enzyme / 100) * 100, 5);
             weightGainRateEl.textContent = weightGainRate + '%';
-            fcrEl.textContent = fcr;
+            fcrEl.textContent = fcr + '%';
+
+            // Logic for the new bone condition hint
+            let hintMessage = '';
+            switch (bone) {
+                case 20:
+                    hintMessage = '魚兒狀況:由於骨粉是20%，魚兒將從第25週開始游動不平衡，並在第30週死亡。';
+                    break;
+                case 15:
+                    hintMessage = '魚兒狀況:由於骨粉是15%，魚兒將從第30週開始游動不平衡，並在第35週死亡。';
+                    break;
+                case 10:
+                    hintMessage = '魚兒狀況:由於骨粉是10%，魚兒將從第40週開始游動不平衡，並在第50週死亡。';
+                    break;
+                case 5:
+                    hintMessage = '魚兒狀況:由於骨粉是5%，魚兒將從第40週開始游動不平衡，並在第50週死亡。';
+                    break;
+                case 0:
+                    hintMessage = '魚兒狀況:由於骨粉是0%，魚兒將在第50週死亡。';
+                    break;
+            }
+            boneConditionHint.textContent = hintMessage;
         }
 
         function roundTo(n, digits) {
@@ -360,7 +383,6 @@
         }
 
         function generateWeightGraph() {
-            // ... (rest of the function is unchanged)
             const protein = parseInt(proteinSlider.value);
             const carbon = parseInt(carbonSlider.value);
             const vitamin = parseInt(vitaminSlider.value);
@@ -368,22 +390,22 @@
             const bone = parseInt(boneSlider.value);
 
             if (protein + carbon + vitamin + enzyme + bone !== 100) {
-                alert('Oops! The total nutrients must be exactly 100%. Check your sliders! 🧐');
+                alert('總營養百分比必須等於 100%. 請調整滑塊。');
                 return;
             }
 
             let initialWeight = parseFloat(initialWeightInput.value);
             if (initialWeight < 20 || initialWeight > 40) {
-                alert('Please enter a starting weight between 20g and 40g.');
+                alert('起始體重必須在 20g 到 40g 之間。');
                 return;
             }
 
-            const weightGainRate = ((0.6 * protein / 100 + 0.2 * carbon / 100 + 0.3 * vitamin / 100) * (1 + 0.1 * enzyme / 100) + 0.15 * bone / 100 - 20 * (bone / 100 * bone / 100));
+            const weightGainRate = ((0.6 * protein / 100 + 0.2 * carbon / 100 + 0.3 * vitamin / 100) *
+            (1 + 0.1 * enzyme / 100) + 0.15 * bone / 100 - 20 * (bone / 100 * bone / 100));
 
             const weeks = Array.from({ length: 51 }, (_, i) => i);
             const weightData = [initialWeight];
             let currentWeight = initialWeight;
-
             for (let i = 1; i <= 50; i++) {
                 currentWeight *= (1 + weightGainRate / 5);
                 weightData.push(currentWeight);
@@ -398,65 +420,42 @@
                 data: {
                     labels: weeks,
                     datasets: [{
-                        label: '重量',
-                        data: weightData,
-                        borderColor: '#3498db',
-                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                        fill: true,
-                        borderWidth: 3
+                        label: '重量', data: weightData, borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)', fill: true, borderWidth: 3
                     }]
                 },
                 options: {
                     responsive: true,
                     scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: '週數',
-                                font: { size: 16, weight: 'bold' },
-                                color: '#00529B'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '重量 (g)',
-                                font: { size: 16, weight: 'bold' },
-                                color: '#00529B'
-                            }
-                        }
-                    }
+                        x: { title: { display: true, text: '週數', font: { size: 16, weight: 'bold' }, color: '#00529B' }},
+                        y: { title: { display: true, text: '重量 (g)', font: { size: 16, weight: 'bold' }, color: '#00529B' }}}
                 }
             });
         }
 
         function generateHealthGraph() {
-            // ... (rest of the function is unchanged)
             const protein = parseInt(proteinSlider.value);
             const carbon = parseInt(carbonSlider.value);
             const vitamin = parseInt(vitaminSlider.value);
             const enzyme = parseInt(enzymeSlider.value);
             const bone = parseInt(boneSlider.value);
-
             if (protein + carbon + vitamin + enzyme + bone !== 100) {
-                alert('Oops! The total nutrients must be exactly 100%. Check your sliders! 🧐');
+                alert('總營養百分比必須等於 100%. 請調整滑塊。');
                 return;
             }
-            
-            const healthIndexChange = (-(1 * Math.pow(1 + bone / 100, 5)) - 0.1 * (carbon/100) + 1.5 * (vitamin/100) + 2 * (enzyme/100) + 0.2 * (protein/100));
-                                       
-            const healthIndexChange2 = (-(1 * Math.pow(1 + bone / 100, 15)) - 0.1 * (carbon/100) + 1.5 * (vitamin/100) + 2.5 * (enzyme/100) + 2 * (protein/100));
-                                       
-                                       
-            const weeks = Array.from({ length: 50 }, (_, i) => i+1);
-            const healthData = [];
-            
-            let currentHealthIndex = 90 + healthIndexChange;
-            healthData.push(currentHealthIndex);
 
-            for (let i = 1; i < 50; i++) {
-                currentHealthIndex += healthIndexChange2;
+            const healthIndexChange = (-(1 * Math.pow(1 + bone / 100, 5)) - 0.1 * (carbon/100) + 1.5 * (vitamin/100) + 2 * (enzyme/100) + 0.2 * (protein/100));
+            const healthIndexChange2 = (-(1 * Math.pow(1 + bone / 100, 15)) - 0.1 * (carbon/100) + 1.5 * (vitamin/100) + 2.5 * (enzyme/100) + 2 * (protein/100));
+
+            const weeks = Array.from({ length: 51 }, (_, i) => i);
+            const healthData = [];
+            healthData.push(90); // Data for Week 0
+
+            let currentHealthIndex = 90 + healthIndexChange;
+            // This loop now correctly calculates from Week 1 to Week 50
+            for (let i = 1; i <= 50; i++) {
                 healthData.push(currentHealthIndex);
+                currentHealthIndex += healthIndexChange2;
             }
 
             if (healthChart) {
@@ -468,34 +467,15 @@
                 data: {
                     labels: weeks,
                     datasets: [{
-                        label: '健康指數',
-                        data: healthData,
-                        borderColor: '#2ecc71',
-                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                        fill: true,
-                        borderWidth: 3
+                        label: '健康指數', data: healthData, borderColor: '#2ecc71',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)', fill: true, borderWidth: 3
                     }]
                 },
                 options: {
                     responsive: true,
                     scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: '週數',
-                                font: { size: 16, weight: 'bold' },
-                                color: '#00529B'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '健康指數',
-                                font: { size: 16, weight: 'bold' },
-                                color: '#00529B'
-                            }
-                        }
-                    }
+                        x: { title: { display: true, text: '週數', font: { size: 16, weight: 'bold' }, color: '#00529B' }},
+                        y: { title: { display: true, text: '健康指數', font: { size: 16, weight: 'bold' }, color: '#00529B' }}}
                 }
             });
         }
@@ -507,34 +487,30 @@
         boneSlider.addEventListener('input', updateValues);
         weightGraphBtn.addEventListener('click', generateWeightGraph);
         healthGraphBtn.addEventListener('click', generateHealthGraph);
-        // refreshBtn.addEventListener('click', () => location.reload()); // Removed old functionality
         updateValues();
 
-        // --- NEW SCRIPT FOR VIDEO MODAL ---
+        // --- SCRIPT FOR VIDEO MODAL ---
         const modal = document.getElementById("videoModal");
         const btn = document.getElementById("openVideoBtn");
         const span = document.getElementById("closeBtn");
         const video = document.getElementById("popup-video");
 
-        // When the user clicks the button, open the modal
         btn.onclick = function() {
             modal.style.display = "flex";
             video.play();
         }
 
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
+        function closeModal() {
             modal.style.display = "none";
             video.pause();
             video.currentTime = 0;
         }
 
-        // When the user clicks anywhere outside of the modal, close it
+        span.onclick = closeModal;
+
         window.onclick = function(event) {
             if (event.target == modal) {
-                modal.style.display = "none";
-                video.pause();
-                video.currentTime = 0;
+                closeModal();
             }
         }
     </script>
