@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fish Feed Formulation Lab🐟</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom right, #89CFF0, #00529B);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        .game-title {
+            font-size: 3em;
+            font-weight: 700;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            width: 100%;
+            max-width: 1600px;
+            gap: 25px;
+            align-items: flex-start;
+        }
+
+        .left-panel, .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid white;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            color: #00529B;
+            border-bottom: 3px dashed #89CFF0;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .slider-container label {
+            width: 280px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .slider-container input[type="range"] {
+            flex-grow: 1;
+        }
+        
+        #totalPercentageDisplay {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.5em;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .buttons button {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1em;
+            font-weight: 600;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex-grow: 1;
+        }
+        #weightGraphBtn { background-color: #3498db; color: white; }
+        #healthGraphBtn { background-color: #2ecc71; color: white; }
+        #openVideoBtn { background-color: #9b59b6; color: white; flex-grow: 0; }
+        .buttons button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .info p {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        .info span {
+            font-weight: 400;
+            color: #2980b9;
+            background-color: #ecf0f1;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        #boneConditionHint {
+            color: #c0392b; /* A reddish color for warnings */
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 3px dashed #89CFF0;
+        }
+
+        .input-group input[type="number"] {
+            font-family: 'Poppins', sans-serif;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 1em;
+            width: 80px;
+        }
+
+        .input-group span {
+           font-weight: 400;
+           font-size: 0.9em;
+        }
+
+        .graphs canvas {
+            max-width: 100%;
+            margin-top: 10px;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        /* --- STYLES FOR VIDEO MODAL --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.75);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 80%;
+            max-width: 900px;
+            position: relative;
+            animation: fadeIn 0.5s;
+        }
+        #popup-video {
+            width: 100%;
+            border-radius: 5px;
+        }
+        .close-button {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            color: #fff;
+            background-color: #333;
+            font-size: 30px;
+            font-weight: bold;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            background-color: #e74c3c;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1 class="game-title">🐠 Fish Feed Formulation Lab 🐠</h1>
+
+    <div class="main-layout">
+        <div class="left-panel">
+            <div class="container">
+                <h2>🧪 Fish Weight & Nutrition Settings</h2>
+                <div class="sliders">
+                    <div class="slider-container">
+                        <label for="protein">💪 Food Waste Protein:</label>
+                        <input type="range" id="protein" min="30" max="60" step="10" value="40">
+                        <span id="proteinValue">60%</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="carbon">⚡ Carbohydrates:</label>
+                        <input type="range" id="carbon" min="20" max="40" step="10" value="40">
+                        <span id="carbonValue">20%</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="vitamin">💊 Vitamin & Mineral Complex:</label>
+                        <input type="range" id="vitamin" min="5" max="15" step="5" value="10">
+                        <span id="vitaminValue">10%</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="enzyme">✨ Protease:</label>
+                        <input type="range" id="enzyme" min="0" max="5" step="5" value="5">
+                        <span id="enzymeValue">5%</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="bone">🦴 Bone Meal:</label>
+                        <input type="range" id="bone" min="0" max="20" step="5" value="5">
+                        <span id="boneValue">5%</span>
+                    </div>
+                    <div id="totalPercentageDisplay">Total: <span id="totalPercentage">100%</span></div>
+                </div>
+
+                <div class="input-group">
+                    <label for="initialWeight">⚖️ Initial Weight:</label>
+                    <input type="number" id="initialWeight" min="20" max="40" value="30">
+                    <span>(20g-40g)</span>
+                </div>
+            </div>
+
+            <div class="container">
+                <h2>📈 Fish Data</h2>
+                <div class="info">
+                    <p>Weight Gain Rate: <span id="weightGainRate"></span></p>
+                    <p>Feed Conversion Ratio (FCR): <span id="fcr"></span></p>
+                    <small>Hint: If the fish's weight approaches zero, it will die.</small>
+                    <br><small id="boneConditionHint"></small><br>
+                </div>
+                 <div class="buttons">
+                    <button id="weightGraphBtn">⚖️ Weight Change Graph</button>
+                    <button id="healthGraphBtn">❤️ Health Index Change Graph</button>
+                    <button id="openVideoBtn">🎬 Fish Animation</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="container graphs">
+                <h2>📊 Results</h2>
+                <canvas id="weightChart"></canvas>
+                <canvas id="healthChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIDDEN VIDEO MODAL HTML -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <span id="closeBtn" class="close-button">&times;</span>
+            <video id="popup-video" controls>
+                <source src="https://kevinwong1150.github.io/eduhk_game_website/fish_new_dead.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+
+    <script>
+        // --- Game Logic ---
+        const proteinSlider = document.getElementById('protein');
+        const carbonSlider = document.getElementById('carbon');
+        const vitaminSlider = document.getElementById('vitamin');
+        const enzymeSlider = document.getElementById('enzyme');
+        const boneSlider = document.getElementById('bone');
+        const proteinValue = document.getElementById('proteinValue');
+        const carbonValue = document.getElementById('carbonValue');
+        const vitaminValue = document.getElementById('vitaminValue');
+        const enzymeValue = document.getElementById('enzymeValue');
+        const boneValue = document.getElementById('boneValue');
+        const totalPercentageEl = document.getElementById('totalPercentage');
+        const totalPercentageDisplay = document.getElementById('totalPercentageDisplay');
+        const weightGainRateEl = document.getElementById('weightGainRate');
+        const fcrEl = document.getElementById('fcr');
+        const initialWeightInput = document.getElementById('initialWeight');
+        const weightGraphBtn = document.getElementById('weightGraphBtn');
+        const healthGraphBtn = document.getElementById('healthGraphBtn');
+        const boneConditionHint = document.getElementById('boneConditionHint'); // Get the new hint element
+        let weightChart;
+        let healthChart;
+
+        function updateValues() {
+            const protein = parseInt(proteinSlider.value);
+            const carbon = parseInt(carbonSlider.value);
+            const vitamin = parseInt(vitaminSlider.value);
+            const enzyme = parseInt(enzymeSlider.value);
+            const bone = parseInt(boneSlider.value);
+            const total = protein + carbon + vitamin + enzyme + bone;
+            proteinValue.textContent = protein + '%';
+            carbonValue.textContent = carbon + '%';
+            vitaminValue.textContent = vitamin + '%';
+            enzymeValue.textContent = enzyme + '%';
+            boneValue.textContent = bone + '%';
+            totalPercentageEl.textContent = total + '%';
+            if (total === 100) {
+                totalPercentageDisplay.style.backgroundColor = '#d4edda';
+                totalPercentageDisplay.style.color = '#155724';
+            } else {
+                totalPercentageDisplay.style.backgroundColor = '#f8d7da';
+                totalPercentageDisplay.style.color = '#721c24';
+            }
+            const weightGainRate = roundTo(((0.6 * protein / 100 + 0.2 * carbon / 100 + 0.3 * vitamin / 100) * (1 + 0.1 * enzyme / 100) + 0.15 * bone / 100 - 20 * (bone / 100 * bone / 100)) * 100, 3);
+            const fcr = roundTo((1.8 + 0.02 * bone / 100 - 0.01 * protein / 100 - 0.005 - 0.03 + enzyme / 100) * 100, 5);
+            weightGainRateEl.textContent = weightGainRate + '%';
+            fcrEl.textContent = fcr + '%';
+
+            // Logic for the new bone condition hint
+            let hintMessage = '';
+            switch (bone) {
+                case 20:
+                    hintMessage = 'Fish Condition: Since bone meal is 20%, the fish will start swimming off-balance from week 25 and die in week 30.';
+                    break;
+                case 15:
+                    hintMessage = 'Fish Condition: Since bone meal is 15%, the fish will start swimming off-balance from week 30 and die in week 35.';
+                    break;
+                case 10:
+                    hintMessage = 'Fish Condition: Since bone meal is 10%, the fish will start swimming off-balance from week 40 and die in week 50.';
+                    break;
+                case 5:
+                    hintMessage = 'Fish Condition: Since bone meal is 5%, the fish will start swimming off-balance from week 40 and die in week 50.';
+                    break;
+                case 0:
+                    hintMessage = 'Fish Condition: Since bone meal is 0%, the fish will die in week 50.';
+                    break;
+            }
+            boneConditionHint.textContent = hintMessage;
+        }
+
+        function roundTo(n, digits) {
+            if (digits === undefined) { digits = 0; }
+            const multiplicator = Math.pow(10, digits);
+            n = parseFloat((n * multiplicator).toFixed(11));
+            return Math.round(n) / multiplicator;
+        }
+
+        function generateWeightGraph() {
+            const protein = parseInt(proteinSlider.value);
+            const carbon = parseInt(carbonSlider.value);
+            const vitamin = parseInt(vitaminSlider.value);
+            const enzyme = parseInt(enzymeSlider.value);
+            const bone = parseInt(boneSlider.value);
+
+            if (protein + carbon + vitamin + enzyme + bone !== 100) {
+                alert('Total nutrition percentage must equal 100%. Please adjust the sliders.');
+                return;
+            }
+
+            let initialWeight = parseFloat(initialWeightInput.value);
+            if (initialWeight < 20 || initialWeight > 40) {
+                alert('Initial weight must be between 20g and 40g.');
+                return;
+            }
+
+            const weightGainRate = ((0.6 * protein / 100 + 0.2 * carbon / 100 + 0.3 * vitamin / 100) *
+            (1 + 0.1 * enzyme / 100) + 0.15 * bone / 100 - 20 * (bone / 100 * bone / 100));
+
+            const weeks = Array.from({ length: 51 }, (_, i) => i);
+            const weightData = [initialWeight];
+            let currentWeight = initialWeight;
+            for (let i = 1; i <= 50; i++) {
+                currentWeight *= (1 + weightGainRate / 5);
+                weightData.push(currentWeight);
+            }
+
+            if (weightChart) {
+                weightChart.destroy();
+            }
+
+            weightChart = new Chart(document.getElementById('weightChart'), {
+                type: 'line',
+                data: {
+                    labels: weeks,
+                    datasets:[{
+                        label: 'Weight', data: weightData, borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)', fill: true, borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Weeks', font: { size: 16, weight: 'bold' }, color: '#00529B' }},
+                        y: { title: { display: true, text: 'Weight (g)', font: { size: 16, weight: 'bold' }, color: '#00529B' }}}
+                }
+            });
+        }
+
+        function generateHealthGraph() {
+            const protein = parseInt(proteinSlider.value);
+            const carbon = parseInt(carbonSlider.value);
+            const vitamin = parseInt(vitaminSlider.value);
+            const enzyme = parseInt(enzymeSlider.value);
+            const bone = parseInt(boneSlider.value);
+            if (protein + carbon + vitamin + enzyme + bone !== 100) {
+                alert('Total nutrition percentage must equal 100%. Please adjust the sliders.');
+                return;
+            }
+
+            const healthIndexChange = (-(1 * Math.pow(1 + bone / 100, 5)) - 0.1 * (carbon/100) + 1.5 * (vitamin/100) + 2 * (enzyme/100) + 0.2 * (protein/100));
+            const healthIndexChange2 = (-(1 * Math.pow(1 + bone / 100, 15)) - 0.1 * (carbon/100) + 1.5 * (vitamin/100) + 2.5 * (enzyme/100) + 2 * (protein/100));
+
+            const weeks = Array.from({ length: 51 }, (_, i) => i);
+            const healthData =[];
+            healthData.push(90); // Data for Week 0
+
+            let currentHealthIndex = 90 + healthIndexChange;
+            // This loop now correctly calculates from Week 1 to Week 50
+            for (let i = 1; i <= 50; i++) {
+                healthData.push(currentHealthIndex);
+                currentHealthIndex += healthIndexChange2;
+            }
+
+            if (healthChart) {
+                healthChart.destroy();
+            }
+
+            healthChart = new Chart(document.getElementById('healthChart'), {
+                type: 'line',
+                data: {
+                    labels: weeks,
+                    datasets:[{
+                        label: 'Health Index', data: healthData, borderColor: '#2ecc71',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)', fill: true, borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Weeks', font: { size: 16, weight: 'bold' }, color: '#00529B' }},
+                        y: { title: { display: true, text: 'Health Index', font: { size: 16, weight: 'bold' }, color: '#00529B' }}}
+                }
+            });
+        }
+
+        proteinSlider.addEventListener('input', updateValues);
+        carbonSlider.addEventListener('input', updateValues);
+        vitaminSlider.addEventListener('input', updateValues);
+        enzymeSlider.addEventListener('input', updateValues);
+        boneSlider.addEventListener('input', updateValues);
+        weightGraphBtn.addEventListener('click', generateWeightGraph);
+        healthGraphBtn.addEventListener('click', generateHealthGraph);
+        updateValues();
+
+        // --- SCRIPT FOR VIDEO MODAL ---
+        const modal = document.getElementById("videoModal");
+        const btn = document.getElementById("openVideoBtn");
+        const span = document.getElementById("closeBtn");
+        const video = document.getElementById("popup-video");
+
+        btn.onclick = function() {
+            modal.style.display = "flex";
+            video.play();
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+            video.pause();
+            video.currentTime = 0;
+        }
+
+        span.onclick = closeModal;
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
