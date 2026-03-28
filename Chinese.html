@@ -224,10 +224,51 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* --- 切換語言按鈕樣式 --- */
+        .lang-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #00529B;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1em;
+            font-weight: 700;
+            padding: 10px 20px;
+            border: 2px solid white;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none; /* 移除超連結底線 */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+            background-color: #ffffff;
+        }
+
+        /* 手機版適應：將按鈕變小並稍微調整位置避免擋住標題 */
+        @media (max-width: 768px) {
+            .lang-btn {
+                top: 10px;
+                right: 10px;
+                font-size: 0.9em;
+                padding: 8px 12px;
+            }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <a href="https://kevinwong1150.github.io/eduhk_game_website/English.html" class="lang-btn">
+        🌐 English
+    </a>
     <h1 class="game-title">🐠 魚糧配方研究所 🐠</h1>
 
     <div class="main-layout">
